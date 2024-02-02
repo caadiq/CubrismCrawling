@@ -13,4 +13,5 @@ async def qualification_details(qualifications: List[Qualification]):
         details = await get_details(qualifications)
         return details
     except Exception as e:
+        print(f"Error occurred while getting details: {e}")
         raise HTTPException(status_code=400, detail=str(e))
