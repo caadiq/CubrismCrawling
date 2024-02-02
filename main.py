@@ -1,13 +1,16 @@
-from fastapi import FastAPI
+from typing import List
+
+from fastapi import FastAPI, HTTPException
+
+from crawler.qualification import get_details, Qualification
 
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.post("/qualification")
+async def qualification_details(qualifications: List[Qualification]):
+    try:
+        details = await get_details(qualifications)
+        return details
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
