@@ -43,47 +43,42 @@ def crawling(code, name):
 # 시험일정
 def get_schedule(soup):
     div_element = soup.select_one(".tbl_normal.tdCenter.mb0")
-    schedule_tables = div_element.select("table")
+    if not div_element:
+        return []
 
+    schedule_rows = div_element.select("tbody > tr")
     schedules = []
-    for schedule_table in schedule_tables:
-        schedule_rows = schedule_table.select("tbody > tr")
 
-        for row in schedule_rows:
-            cells = row.select("td")
-            # 구분
-            category = cells[0].get_text(strip=True) if cells[0].get_text(strip=True) else None
-            # 필기원서접수
-            written_app = cells[1].get_text(strip=True) if cells[1].get_text(strip=True) else None
-            written_app = re.sub(r'\s*~\s*', '~', written_app)
-            # 필기시험
-            written_exam = cells[2].get_text(strip=True) if cells[2].get_text(strip=True) else None
-            written_exam = re.sub(r'\s*~\s*', '~', written_exam)
-            # 필기합격발표
-            written_exam_result = cells[3].get_text(strip=True) if cells[3].get_text(strip=True) else None
+    for row in schedule_rows:
+        cells = row.select("td")
+        schedule_data = []
 
-            # 실기원서접수
-            practical_app_raw = cells[4].get_text(" ", strip=True) if cells[4].get_text(" ",strip=True) else None
+        for cell in cells:
+            text = cell.text.strip().replace('\n', ' ').replace('\r', '').replace('\t', '')
+            colspan = cell.get('colspan')
+
+            if colspan:
+                colspan = int(colspan)
+                schedule_data.extend([text] * colspan)
+            else:
+                schedule_data.append(text)
+
+        if len(schedule_data) > 4:
+            practical_app_raw = schedule_data[4]
             practical_app_parts = practical_app_raw.split(" ") if practical_app_raw else None
-            practical_app = practical_app_parts[0] if practical_app_parts else None
-            practical_app = re.sub(r'\s*~\s*', '~', practical_app)
+            practical_app = practical_app_parts[0] if practical_app_parts else ""
+            schedule_data[4] = practical_app
 
-            # 실기시험
-            practical_exam = cells[5].get_text(strip=True) if cells[5].get_text(strip=True) else None
-            practical_exam = re.sub(r'\s*~\s*', '~', practical_exam)
-            # 최종합격자 발표일
-            ptractical_exam_result = cells[6].get_text(strip=True) if cells[6].get_text(strip=True) else None
-
+        if len(schedule_data) >= 7:
             schedule = {
-                "구분": category,
-                "필기원서접수": written_app,
-                "필기시험": written_exam,
-                "필기합격발표": written_exam_result,
-                "실기원서접수": practical_app,
-                "실기시험": practical_exam,
-                "최종합격자 발표일": ptractical_exam_result,
+                "구분": schedule_data[0],
+                "필기원서접수": schedule_data[1],
+                "필기시험": schedule_data[2],
+                "필기합격발표": schedule_data[3],
+                "실기원서접수": schedule_data[4],
+                "실기시험": schedule_data[5],
+                "최종합격자 발표일": schedule_data[6],
             }
-
             schedules.append(schedule)
 
     return schedules
