@@ -44,7 +44,7 @@ def crawling(code, name):
 def get_schedule(soup):
     div_element = soup.select_one(".tbl_normal.tdCenter.mb0")
     if not div_element:
-        return []
+        return None
 
     schedule_rows = div_element.select("tbody > tr")
     schedules = []
@@ -64,22 +64,24 @@ def get_schedule(soup):
             else:
                 schedule_data.append(text)
 
+        if "시험 일정이 없습니다." in schedule_data:
+            return None
 
         if len(schedule_data) > 4:
             practical_app_raw = schedule_data[4]
             practical_app_parts = practical_app_raw.split(" ") if practical_app_raw else None
-            practical_app = practical_app_parts[0] if practical_app_parts else ""
+            practical_app = practical_app_parts[0] if practical_app_parts else None
             schedule_data[4] = practical_app
 
         if len(schedule_data) >= 7:
             schedule = {
-                "구분": schedule_data[0],
-                "필기원서접수": schedule_data[1],
-                "필기시험": schedule_data[2],
-                "필기합격발표": schedule_data[3],
-                "실기원서접수": schedule_data[4],
-                "실기시험": schedule_data[5],
-                "최종합격자 발표일": schedule_data[6],
+                "구분": schedule_data[0] if schedule_data[0] else None,
+                "필기원서접수": schedule_data[1] if schedule_data[1] else None,
+                "필기시험": schedule_data[2] if schedule_data[2] else None,
+                "필기합격발표": schedule_data[3] if schedule_data[3] else None,
+                "실기원서접수": schedule_data[4] if schedule_data[4] else None,
+                "실기시험": schedule_data[5] if schedule_data[5] else None,
+                "최종합격자 발표일": schedule_data[6] if schedule_data[6] else None
             }
             schedules.append(schedule)
 
