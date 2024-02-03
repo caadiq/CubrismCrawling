@@ -1,9 +1,13 @@
 import re
 from typing import List
+import logging
 
 import requests
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Qualification(BaseModel):
@@ -14,14 +18,22 @@ class Qualification(BaseModel):
 async def get_details(qualifications: List[Qualification]):
     details = {}
     for qualification in qualifications:
+        logging.debug(f"Getting details for qualification {qualification.name} ({qualification.code})")
+
         soup = crawling(qualification.code, qualification.name)
 
         schedule = get_schedule(soup)
+        logging.debug(f"Schedule: {schedule}")
         fee = get_fee(soup)
+        logging.debug(f"Fee: {fee}")
         tendency = get_tendency_and_acquisition(soup, "출제경향")
+        logging.debug(f"Tendency: {tendency}")
         standard = get_standard_and_question(soup, "출제기준")
+        logging.debug(f"Standard: {standard}")
         question = get_standard_and_question(soup, "공개문제")
+        logging.debug(f"Question: {question}")
         acquisition = get_tendency_and_acquisition(soup, "취득방법")
+        logging.debug(f"Acquisition: {acquisition}")
 
         details[qualification.name] = {"시험일정": schedule, "수수료": fee, "출제경향": tendency, "출제기준": standard, "공개문제": question, "취득방법": acquisition}
 
@@ -55,6 +67,7 @@ def get_schedule(soup):
 
         for cell in cells:
             text = cell.text.strip().replace('\n', ' ').replace('\r', '').replace('\t', '')
+            text = re.sub(r'\s*~\s*', '~', text)
             colspan = cell.get('colspan')
 
             if colspan:
@@ -62,6 +75,7 @@ def get_schedule(soup):
                 schedule_data.extend([text] * colspan)
             else:
                 schedule_data.append(text)
+
 
         if len(schedule_data) > 4:
             practical_app_raw = schedule_data[4]
