@@ -87,7 +87,7 @@ def get_schedule(soup):
                 "category": schedule_data[0] if schedule_data[0] else None,
                 "writtenApp": schedule_data[1] if schedule_data[1] else None,
                 "writtenExam": schedule_data[2] if schedule_data[2] else None,
-                "writtemExamResult": schedule_data[3] if schedule_data[3] else None,
+                "writtenExamResult": schedule_data[3] if schedule_data[3] else None,
                 "practicalApp": schedule_data[4] if schedule_data[4] else None,
                 "practicalExam": schedule_data[5] if schedule_data[5] else None,
                 "practicalExamResult": schedule_data[6] if schedule_data[6] else None
