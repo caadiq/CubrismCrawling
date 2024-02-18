@@ -1,5 +1,6 @@
 import logging
 import re
+from time import sleep
 from typing import List
 
 import requests
@@ -39,11 +40,18 @@ async def get_details(qualifications: List[Qualification]):
 # 크롤링
 def crawling(code, name):
     url = f"https://www.q-net.or.kr/crf005.do?id=crf00503s02&gSite=Q&gId=&jmInfoDivCcd=B0&jmCd={code}&jmNm={name}"
-    response = requests.get(
-        url=url,
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
-        verify=False
-    )
+    try:
+        response = requests.get(
+            url=url,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
+            verify=False
+        )
+    except ConnectionError:
+        logging.error("Connection refused")
+        return None
+
+    sleep(0.5)
+
     soup = BeautifulSoup(response.content, 'html.parser')
 
     return soup
