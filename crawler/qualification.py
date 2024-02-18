@@ -1,9 +1,14 @@
+import logging
 import re
 from typing import List
 
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+
+logging.basicConfig(level=logging.INFO)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class Qualification(BaseModel):
@@ -12,7 +17,7 @@ class Qualification(BaseModel):
 
 
 async def get_details(qualifications: List[Qualification]):
-    details = {}
+    details = []
     for qualification in qualifications:
         soup = crawling(qualification.code, qualification.name)
 
@@ -23,7 +28,10 @@ async def get_details(qualifications: List[Qualification]):
         question = get_standard_and_question(soup, "공개문제")
         acquisition = get_tendency_and_acquisition(soup, "취득방법")
 
-        details[qualification.name] = {"시험일정": schedule, "수수료": fee, "출제경향": tendency, "출제기준": standard, "공개문제": question, "취득방법": acquisition}
+        qualification_details = {"name": qualification.name, "code": qualification.code, "schedule": schedule, "fee": fee, "tendency": tendency, "standard": standard, "question": question, "acquisition": acquisition}
+        details.append(qualification_details)
+
+        logging.info(f"{qualification.name} : {qualification_details}")
 
     return details
 
@@ -33,7 +41,8 @@ def crawling(code, name):
     url = f"https://www.q-net.or.kr/crf005.do?id=crf00503s02&gSite=Q&gId=&jmInfoDivCcd=B0&jmCd={code}&jmNm={name}"
     response = requests.get(
         url=url,
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"}
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
+        verify=False
     )
     soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -75,13 +84,13 @@ def get_schedule(soup):
 
         if len(schedule_data) >= 7:
             schedule = {
-                "구분": schedule_data[0] if schedule_data[0] else None,
-                "필기원서접수": schedule_data[1] if schedule_data[1] else None,
-                "필기시험": schedule_data[2] if schedule_data[2] else None,
-                "필기합격발표": schedule_data[3] if schedule_data[3] else None,
-                "실기원서접수": schedule_data[4] if schedule_data[4] else None,
-                "실기시험": schedule_data[5] if schedule_data[5] else None,
-                "최종합격자 발표일": schedule_data[6] if schedule_data[6] else None
+                "category": schedule_data[0] if schedule_data[0] else None,
+                "writtenApp": schedule_data[1] if schedule_data[1] else None,
+                "writtenExam": schedule_data[2] if schedule_data[2] else None,
+                "writtemExamResult": schedule_data[3] if schedule_data[3] else None,
+                "practicalApp": schedule_data[4] if schedule_data[4] else None,
+                "practicalExam": schedule_data[5] if schedule_data[5] else None,
+                "practicalExamResult": schedule_data[6] if schedule_data[6] else None
             }
             schedules.append(schedule)
 
@@ -102,8 +111,8 @@ def get_fee(soup):
 
     fees = {}
     fee_pattern = {
-        '필기': r'필기\s*:\s*([\d,]+)\s*원',
-        '실기': r'실기\s*:\s*([\d,]+)\s*원',
+        'writtenFee': r'필기\s*:\s*([\d,]+)\s*원',
+        'practicalFee': r'실기\s*:\s*([\d,]+)\s*원',
     }
 
     for exam_type, pattern in fee_pattern.items():
