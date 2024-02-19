@@ -8,6 +8,8 @@ import urllib3
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
+import config
+
 logging.basicConfig(level=logging.INFO)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -29,7 +31,12 @@ async def get_details(qualifications: List[Qualification]):
         question = get_standard_and_question(soup, "공개문제")
         acquisition = get_tendency_and_acquisition(soup, "취득방법")
 
-        qualification_details = {"name": qualification.name, "code": qualification.code, "schedule": schedule, "fee": fee, "tendency": tendency, "standard": standard, "question": question, "acquisition": acquisition}
+        book_info = get_book_info(qualification.name)
+        books = parse_book_info(book_info)
+
+        qualification_details = {"name": qualification.name, "code": qualification.code, "schedule": schedule,
+                                 "fee": fee, "tendency": tendency, "standard": standard, "question": question,
+                                 "acquisition": acquisition, "books": books}
         details.append(qualification_details)
 
         logging.info(f"{qualification.name} : {qualification_details}")
@@ -43,7 +50,8 @@ def crawling(code, name):
     try:
         response = requests.get(
             url=url,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
             verify=False
         )
     except ConnectionError:
@@ -134,7 +142,7 @@ def get_fee(soup):
     return fees
 
 
-#출제기준 및 공개문제
+# 출제기준 및 공개문제
 def get_standard_and_question(soup, title):
     dt_element = soup.find("dt", string=title)
     if not dt_element:
@@ -187,3 +195,27 @@ def get_tendency_and_acquisition(soup, title):
     text = text.lstrip('\n').rstrip('\n')
 
     return text
+
+
+def get_book_info(query):
+    url = f"https://dapi.kakao.com/v3/search/book?target=title&sort=latest&size=5&query={query}"
+    headers = {"Authorization": f"KakaoAK {config.kakao_api_key}"}  # 여기에 실제 REST API 키를 입력해야 합니다.
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
+def parse_book_info(book_info):
+    books = []
+    for document in book_info["documents"]:
+        book = {
+            "authors": document["authors"],
+            "datetime": document["datetime"],
+            "price": document["price"],
+            "publisher": document["publisher"],
+            "sale_price": document["sale_price"],
+            "thumbnail": document["thumbnail"],
+            "title": document["title"],
+            "url": document["url"]
+        }
+        books.append(book)
+    return books

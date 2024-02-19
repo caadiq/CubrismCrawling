@@ -57,6 +57,7 @@ cmake-build-*/
 out/
 .venv
 .idea
+config.py
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
