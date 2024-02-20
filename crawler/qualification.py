@@ -50,15 +50,14 @@ def crawling(code, name):
     try:
         response = requests.get(
             url=url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Whale/3.24.223.18 Safari/537.36"},
             verify=False
         )
     except ConnectionError:
         logging.error("Connection refused")
         return None
 
-    sleep(0.5)
+    sleep(0.5)  # max tries exceeded with url 에러 방지를 위해 0.5초 딜레이 추가
 
     soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -100,13 +99,13 @@ def get_schedule(soup):
 
         if len(schedule_data) >= 7:
             schedule = {
-                "category": schedule_data[0] if schedule_data[0] else None,
-                "writtenApp": schedule_data[1] if schedule_data[1] else None,
-                "writtenExam": schedule_data[2] if schedule_data[2] else None,
-                "writtenExamResult": schedule_data[3] if schedule_data[3] else None,
-                "practicalApp": schedule_data[4] if schedule_data[4] else None,
-                "practicalExam": schedule_data[5] if schedule_data[5] else None,
-                "practicalExamResult": schedule_data[6] if schedule_data[6] else None
+                "category": schedule_data[0] if schedule_data[0] else None,  # 구분
+                "writtenApp": schedule_data[1] if schedule_data[1] else None,  # 필기원서접수
+                "writtenExam": schedule_data[2] if schedule_data[2] else None,  # 필기시험
+                "writtenExamResult": schedule_data[3] if schedule_data[3] else None,  # 필기합격발표
+                "practicalApp": schedule_data[4] if schedule_data[4] else None,  # 실기원서접수
+                "practicalExam": schedule_data[5] if schedule_data[5] else None,  # 실기시험
+                "practicalExamResult": schedule_data[6] if schedule_data[6] else None  # 최종합격자 팔표일
             }
             schedules.append(schedule)
 
@@ -197,9 +196,10 @@ def get_tendency_and_acquisition(soup, title):
     return text
 
 
+# 카카오 책 검색 API
 def get_book_info(query):
     url = f"https://dapi.kakao.com/v3/search/book?target=title&sort=latest&size=5&query={query}"
-    headers = {"Authorization": f"KakaoAK {config.kakao_api_key}"}  # 여기에 실제 REST API 키를 입력해야 합니다.
+    headers = {"Authorization": f"KakaoAK {config.kakao_api_key}"}
     response = requests.get(url, headers=headers)
     return response.json()
 
@@ -208,14 +208,14 @@ def parse_book_info(book_info):
     books = []
     for document in book_info["documents"]:
         book = {
-            "authors": document["authors"],
-            "datetime": document["datetime"],
-            "price": document["price"],
-            "publisher": document["publisher"],
-            "sale_price": document["sale_price"],
-            "thumbnail": document["thumbnail"],
-            "title": document["title"],
-            "url": document["url"]
+            "authors": document["authors"],  # 저자
+            "datetime": document["datetime"],  # 출간일
+            "price": document["price"],  # 정가
+            "publisher": document["publisher"],  # 출판사
+            "sale_price": document["sale_price"],  # 판매가
+            "thumbnail": document["thumbnail"],  # 책 표지
+            "title": document["title"],  # 제목
+            "url": document["url"]  # 링크
         }
         books.append(book)
     return books
