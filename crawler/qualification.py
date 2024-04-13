@@ -100,10 +100,14 @@ def get_schedule(soup):
         if len(schedule_data) >= 7:
             schedule = {
                 "category": schedule_data[0] if schedule_data[0] else None,  # 구분
-                "writtenApp": schedule_data[1] if schedule_data[1] else None,  # 필기원서접수
+                "writtenApp": re.search(r'\d{4}.\d{2}.\d{2}~\d{4}.\d{2}.\d{2}',
+                                        schedule_data[1]).group() if re.search(r'\d{4}.\d{2}.\d{2}~\d{4}.\d{2}.\d{2}',
+                                                                               schedule_data[1]) else None,  # 필기원서접수
                 "writtenExam": schedule_data[2] if schedule_data[2] else None,  # 필기시험
                 "writtenExamResult": schedule_data[3] if schedule_data[3] else None,  # 필기합격발표
-                "practicalApp": schedule_data[4] if schedule_data[4] else None,  # 실기원서접수
+                "practicalApp": re.search(r'\d{4}.\d{2}.\d{2}~\d{4}.\d{2}.\d{2}',
+                                          schedule_data[4]).group() if re.search(
+                    r'\d{4}.\d{2}.\d{2}~\d{4}.\d{2}.\d{2}', schedule_data[4]) else None,  # 실기원서접수
                 "practicalExam": schedule_data[5] if schedule_data[5] else None,  # 실기시험
                 "practicalExamResult": schedule_data[6] if schedule_data[6] else None  # 최종합격자 팔표일
             }
