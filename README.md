@@ -18,11 +18,18 @@
 ## :abacus: API Docs
 ### 자격증 상세정보 요청하기
 
-| **HTTP** | **Path**  |
-| --------- | --------- |
-| POST | /qualification |
+| HTTP | Path  |
+| --- | --- |
+| <code>POST</code> | /qualification |
 
 #### 요청
+
+##### 본문
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| code | String | 자격증 코드 |
+| name | String | 자격증 이름 |
+
 ```json
 [
     {
@@ -33,7 +40,48 @@
 ]
 ```
 
+<br>
+
 #### 응답
+
+##### 본문
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| name | String | 자격증 이름 |
+| code | String | 자격증 코드 |
+| tendency | String | 출제 경향 |
+| acquisition | String | 취득 방법 |
+
+##### fee (수수료)
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| writtenFee | Int | 필기 수수료 |
+| practicalFee | Int | 실기 수수료 |
+
+##### standard (출제 기준)
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| filePath | String | 파일 경로 |
+| fileName | String | 파일 이름 |
+
+##### question (공개 문제)
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| filePath | String | 파일 경로 |
+| fileName | String | 파일 이름 |
+
+##### books (추천 도서)
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| authors | String | 저자 |
+| datetime | DateTime | 출간일 |
+| price | Int | 정가 |
+| publisher | String | 출판사 |
+| sale_price | Int | 판매가 |
+| thumbnail | String | 책 표지 |
+| title | String | 책 제목 |
+| url | String | 링크 |
+
 ```json
 [
     {
