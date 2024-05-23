@@ -16,7 +16,74 @@
 </br>
 
 ## :abacus: API Docs
+### 자격증 상세정보 요청하기
 
+| **HTTP** | **Path**  |
+| --------- | --------- |
+| POST | /qualification |
+
+#### 요청
+```json
+[
+    {
+        "code": "1320",
+        "name": "정보처리기사"
+    },
+    ···
+]
+```
+
+#### 응답
+```json
+[
+    {
+        "name": "정보처리기사",
+        "code": "1320",
+        "schedule": [
+            {
+                "category": "2024년 정기 기사 1회",
+                "writtenApp": "2024.01.23~2024.01.26",
+                "writtenExam": "2024.02.15~2024.03.07",
+                "writtenExamResult": "2024.03.13",
+                "practicalApp": "2024.03.26~2024.03.29",
+                "practicalExam": "2024.04.27~2024.05.17",
+                "practicalExamResult": "2024.06.18"
+            },
+            ···
+        ],
+        "fee": {
+            "writtenFee": 19400,
+            "practicalFee": 22600
+        },
+        "tendency": "<실기시험 출제 경향>\n정보시스템 등의 개발 요구 사항을 이해하여 각 업무에 맞는 소프트웨어의 기능에 관한 설계, 구현 및 테스트를 수행에 필요한\n1. 현행 시스템 분석 및 요구사항 확인(소프트웨어 공학 기술의 요구사항 분석 기법 활용)\n2. 데이터 입출력 구현(논리, 물리데이터베이스 설계, 조작 프로시저 등) ···",
+        "standard": [
+            {
+                "filePath": "bbs/Q006/Q006_2204043",
+                "fileName": "정보처리기사 출제기준(2020.1.1.~2022.12.31).hwp"
+            },
+            ···
+        ],
+        "question": null,
+        "acquisition": "① 시 행 처 : 한국산업인력공단\n② 관련학과 : 모든 학과 응시가능 ···",
+        "books": [
+            {
+                "authors": [
+                    "에듀채널 편집부"
+                ],
+                "datetime": "2024-05-17T00:00:00.000+09:00",
+                "price": 9000,
+                "publisher": "북스케치",
+                "sale_price": -1,
+                "thumbnail": "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F6635273",
+                "title": "정보처리산업기사 필기 기출 및 예상 문제",
+                "url": "https://search.daum.net/search?w=bookpage&bookId=6635273&q=%EC%A0%95%EB%B3%B4%EC%B2%98%EB%A6%AC%EC%82%B0%EC%97%85%EA%B8%B0%EC%82%AC+%ED%95%84%EA%B8%B0+%EA%B8%B0%EC%B6%9C+%EB%B0%8F+%EC%98%88%EC%83%81+%EB%AC%B8%EC%A0%9C"
+            },
+            ···
+        ]
+    },
+    ···
+]
+```
 
 </br>
 
