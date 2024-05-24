@@ -50,6 +50,17 @@
 | tendency | String | 출제 경향 |
 | acquisition | String | 취득 방법 |
 
+##### schedule (시험 일정)
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| category | String | 구분 |
+| writtenApp | String | 필기원서접수 |
+| writtenExam | String | 필기시험 |
+| writtenExamResult | String | 필기합격발표 |
+| practicalApp | String | 실기원서접수 |
+| practicalExam | String | 실기시험 |
+| practicalExamResult | String | 최종합격발표 |
+
 ##### fee (수수료)
 | 이름 | 타입 | 설명 |
 | --- | --- | --- |
